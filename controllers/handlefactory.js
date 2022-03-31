@@ -85,6 +85,8 @@ exports.getAll = (Model) => {
       .sort()
       .pagination();
 
+    // tra ve phan tich sau khi truy van nhu: tong thoi gian, so document phai lap qua, ...
+    // const tours = await features.query.explain();
     const tours = await features.query;
 
     res.status(200).json({

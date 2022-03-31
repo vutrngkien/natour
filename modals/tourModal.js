@@ -107,11 +107,15 @@ const tourSchema = new Schema(
   },
   { toJSON: { virtuals: true } }
 );
+// tang hieu suat cho truy van du lieu bang cac set index cho field va mongo engine se tim kiem qua binary search ma khong can phai lap qua tat ca document de time kiem
+// tourSchema.index({ price: 1 });
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+tourSchema.index({ slug: 1 });
 
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
-// virtual populate: vi k luu id cua re view trong tour array vi so luong review co the la vo han. ta co the lay review trong tour ma khong luu id cua review thong qua virtual
+// virtual populate: vi k luu id cua review trong tour array vi so luong review co the la vo han. ta co the lay review trong tour ma khong luu id cua review thong qua virtual
 tourSchema.virtual('reviews', {
   ref: 'Review',
   localField: '_id',

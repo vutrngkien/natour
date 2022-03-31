@@ -70,20 +70,20 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
 };
 
 // bcrypt password truoc khi save (thin controller, fat modals)
-// userSchema.pre('save', async function (next) {
-//   // check xem user co bi chinh sua hay khong (cu the laf password) neu co thi func dc chay k thi next
-//   if (!this.isModified('password')) return next();
-//   // auto gen salt and hash password
-//   this.password = await bcrypt.hash(this.password, 12);
-//   this.passwordConfirm = undefined;
-//   next();
-// });
+userSchema.pre('save', async function (next) {
+  // check xem user co bi chinh sua hay khong (cu the laf password) neu co thi func dc chay k thi next
+  if (!this.isModified('password')) return next();
+  // auto gen salt and hash password
+  this.password = await bcrypt.hash(this.password, 12);
+  this.passwordConfirm = undefined;
+  next();
+});
 
-// userSchema.pre('save', function (next) {
-//   if (!this.isModified() || this.isNew) return next();
-//   this.passwordChangedAt = Date.now() - 1000;
-//   next();
-// });
+userSchema.pre('save', function (next) {
+  if (!this.isModified() || this.isNew) return next();
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
 
 userSchema.pre(/^find/, function (next) {
   this.find({ active: { $ne: false } });
