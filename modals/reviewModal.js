@@ -1,6 +1,5 @@
-const Tour = require('./tourModal');
-
 const mongoose = require('mongoose');
+const Tour = require('./tourModal');
 
 const { Schema } = mongoose;
 
