@@ -36,6 +36,10 @@ const tourSchema = new Schema(
       default: 4.5,
       min: [1, 'Rating must be above 1.0'],
       max: [5, 'Rating must be below 5.0'],
+      // khi dc set value moi thi ham nay se chay
+      set: (val) => {
+        return Math.round(val * 10) / 10;
+      },
     },
     ratingsQuantity: {
       type: Number,
@@ -111,6 +115,7 @@ const tourSchema = new Schema(
 // tourSchema.index({ price: 1 });
 tourSchema.index({ price: 1, ratingsAverage: -1 });
 tourSchema.index({ slug: 1 });
+tourSchema.index({ startLocation: '2dsphere' });
 
 tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
@@ -169,28 +174,8 @@ tourSchema.post(/^find/, function (docs, next) {
 
 tourSchema.pre('aggregate', function (next) {
   console.log(this.pipeline());
-  //no se tra ve array giong nhu ben duoi
-  // [
-  //     { $unwind: '$startDates' },
-  //     {
-  //       $match: {
-  //         startDates: {
-  //           $gte: new Date(`${year}-01-01`),
-  //           $lte: new Date(`${year}-12-01`),
-  //         },
-  //       },
-  //     },
-  //     {
-  //       $group: {
-  //         _id: { $month: '$startDates' },
-  //         numTours: { $sum: 1 },
-  //         tours: { $push: '$name' },
-  //       },
-  //     },
-  //     { $addFields: { month: '$_id' } },
-  //     { $project: { _id: 0 } },
-  //     { $sort: { numTours: -1 } },
-  //   ]
+  // no se tra ve array giong nhu ben duoi
+
   next();
 });
 module.exports = mongoose.model('Tour', tourSchema);

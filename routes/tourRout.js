@@ -7,6 +7,12 @@ const Router = express.Router();
 
 Router.use('/:tourId/reviews', reviewRout);
 
+Router.route('/tour-within/:distance/center/:latlng/unit/:unit').get(
+  tourController.tourWithin
+);
+
+Router.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
+
 Router.route('/top-5-cheap').get(
   tourController.aliasTop5,
   tourController.getAllTours

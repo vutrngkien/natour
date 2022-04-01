@@ -34,6 +34,9 @@ const reviewSchema = new Schema(
   { toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
+// nguoi dung chi co the review 1 lan duy nhat
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
+
 // Query middleware
 reviewSchema.pre(/^find/, function (next) {
   // this.populate({
@@ -50,7 +53,7 @@ reviewSchema.pre(/^find/, function (next) {
   next();
 });
 
-reviewSchema.statics.calcAverageRating = async function (tourId) {
+reviewSchema.statics.calcAverageRatings = async function (tourId) {
   const stats = await this.aggregate([
     { $match: { tour: tourId } },
     {
@@ -61,14 +64,26 @@ reviewSchema.statics.calcAverageRating = async function (tourId) {
       },
     },
   ]);
-  await Tour.findByIdAndUpdate(tourId, {
-    ratingsAverage: stats[0].avgRatings,
-    ratingsQuantity: stats[0].nReviews,
-  });
+  if (stats[0]) {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsAverage: stats[0].avgRatings,
+      ratingsQuantity: stats[0].nReviews,
+    });
+  } else {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsAverage: 0,
+      ratingsQuantity: 0,
+    });
+  }
 };
 
 reviewSchema.post('save', async function () {
-  this.constructor.calcAverageRating(this.tour);
+  this.constructor.calcAverageRatings(this.tour);
+});
+
+//doc.constructor => tro toi Review Model
+reviewSchema.post(/^findOneAnd/, async (doc) => {
+  if (doc) await doc.constructor.calcAverageRatings(doc.tour);
 });
 
 module.exports = mongoose.model('Review', reviewSchema);

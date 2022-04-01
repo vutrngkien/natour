@@ -1,4 +1,4 @@
-require('dotenv').config({ path: './config.env' });
+require('dotenv').config({ path: './.env' });
 
 // xử lý error của sync, vd: console.log(x) x chưa được khai báo
 process.on('uncaughtException', (err) => {
