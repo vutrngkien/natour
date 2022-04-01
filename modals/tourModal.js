@@ -174,7 +174,6 @@ tourSchema.post(/^find/, function (docs, next) {
 
 tourSchema.pre('aggregate', function (next) {
   console.log(this.pipeline());
-  // no se tra ve array giong nhu ben duoi
 
   next();
 });
