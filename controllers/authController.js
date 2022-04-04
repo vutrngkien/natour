@@ -64,6 +64,16 @@ exports.login = catchAsync(async (req, res, next) => {
   createSendToken(user, 201, res, false);
 });
 
+exports.logout = (req, res) => {
+  // tao ra jwt moi khong co gia tri tra ve client
+  // sau khi nhan jwt moi thi nguoi dung khong con login
+  res.cookie('jwt', 'logout', {
+    httpOnly: true,
+    expires: new Date(Date.now() + 10 * 1000),
+  });
+  res.status(200).json({ status: 'success' });
+};
+
 exports.protect = catchAsync(async (req, res, next) => {
   //1 check token exist
   let token;
@@ -97,25 +107,29 @@ exports.protect = catchAsync(async (req, res, next) => {
 });
 
 // only use for view rout, no errors!
-exports.isLoggedIn = catchAsync(async (req, res, next) => {
-  //1 check token exist
-  if (req.cookies.jwt) {
-    //Takes a function following the common error-first callback style, i.e. taking an (err, value) => ... callback as the last argument, and returns a version that returns promises. ***lay func thuong roi return ra promise***
-    const decode = await promisify(jwt.verify)(
-      req.cookies.jwt,
-      process.env.JWT_SECRET
-    );
-    //3 check if user still exist
-    const foundUser = await User.findById(decode.id);
-    if (!foundUser) return next();
-    //4 check if user changed password after the token was issued(provide)
-    if (foundUser.changedPasswordAfter(decode.iat)) return next();
-    // gán user vào req để sử dụng cho middlware sau
-    res.locals.user = foundUser;
+exports.isLoggedIn = async (req, res, next) => {
+  try {
+    //1 check token exist
+    if (req.cookies.jwt) {
+      //Takes a function following the common error-first callback style, i.e. taking an (err, value) => ... callback as the last argument, and returns a version that returns promises. ***lay func thuong roi return ra promise***
+      const decode = await promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+      );
+      //3 check if user still exist
+      const foundUser = await User.findById(decode.id);
+      if (!foundUser) return next();
+      //4 check if user changed password after the token was issued(provide)
+      if (foundUser.changedPasswordAfter(decode.iat)) return next();
+      // gán user vào req để sử dụng cho middlware sau
+      res.locals.user = foundUser;
+      return next();
+    }
+  } catch (err) {
     return next();
   }
   next();
-});
+};
 
 exports.restrictTo = (...roles) => {
   // roles = ['admin', 'lead-guide']
