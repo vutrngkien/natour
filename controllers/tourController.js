@@ -1,4 +1,4 @@
-const Tour = require('../modals/tourModal');
+const Tour = require('../models/tourModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const handleFactory = require('./handlefactory');

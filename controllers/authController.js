@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const { promisify } = require('util'); // build-in nodejs
 const jwt = require('jsonwebtoken');
 const catchAsync = require('../utils/catchAsync');
-const User = require('../modals/userModal');
+const User = require('../models/userModel');
 const AppError = require('../utils/appError');
 const sendEmail = require('../utils/email');
 
@@ -72,6 +72,8 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
   if (!token)
     return next(
@@ -91,6 +93,27 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   // gán user vào req để sử dụng cho middlware sau
   req.user = foundUser;
+  next();
+});
+
+// only use for view rout, no errors!
+exports.isLoggedIn = catchAsync(async (req, res, next) => {
+  //1 check token exist
+  if (req.cookies.jwt) {
+    //Takes a function following the common error-first callback style, i.e. taking an (err, value) => ... callback as the last argument, and returns a version that returns promises. ***lay func thuong roi return ra promise***
+    const decode = await promisify(jwt.verify)(
+      req.cookies.jwt,
+      process.env.JWT_SECRET
+    );
+    //3 check if user still exist
+    const foundUser = await User.findById(decode.id);
+    if (!foundUser) return next();
+    //4 check if user changed password after the token was issued(provide)
+    if (foundUser.changedPasswordAfter(decode.iat)) return next();
+    // gán user vào req để sử dụng cho middlware sau
+    res.locals.user = foundUser;
+    return next();
+  }
   next();
 });
 

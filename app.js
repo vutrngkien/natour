@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
@@ -5,16 +6,21 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cookieParser = require('cookie-parser');
 
 const tourRout = require('./routes/tourRout');
 const userRout = require('./routes/userRout');
 const reviewRout = require('./routes/reviewRout');
+const viewRout = require('./routes/viewRout');
 
 const errorController = require('./controllers/errorController');
 const AppError = require('./utils/appError');
 
 const app = express();
 
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
+app.use(express.static(path.join(__dirname, 'public')));
 //setting security http header
 app.use(helmet());
 
@@ -31,6 +37,7 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 //body parser, reading data from body to req.body
 app.use(express.json({ limit: '10kb' }));
+app.use(cookieParser());
 //data sanitization against NoSQL query injection: nguoi dung co the truyen query vao body vd: {"email": {$gt: ""}} do vay can ngan chan cac truy van den tu nguoi dung
 app.use(mongoSanitize());
 
@@ -53,9 +60,11 @@ app.use(
 // Test middleware
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
+  // console.log(req.cookies);
   next();
 });
 
+app.use('/', viewRout);
 app.use('/api/v1/tours', tourRout);
 app.use('/api/v1/users', userRout);
 app.use('/api/v1/review', reviewRout);

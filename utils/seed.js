@@ -1,8 +1,8 @@
 const fs = require('fs');
 const mongoose = require('mongoose');
-const Tour = require('../modals/tourModal');
-const User = require('../modals/userModal');
-const Review = require('../modals/reviewModal');
+const Tour = require('../models/tourModel');
+const User = require('../models/userModel');
+const Review = require('../models/reviewModel');
 
 mongoose.connect('mongodb://localhost:27017/natours');
 
