@@ -103,6 +103,7 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   // gán user vào req để sử dụng cho middlware sau
   req.user = foundUser;
+  res.locals.user = foundUser;
   next();
 });
 
