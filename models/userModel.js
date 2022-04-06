@@ -39,7 +39,10 @@ const userSchema = new Schema({
       message: 'password confirm is not match',
     },
   },
-  photo: String,
+  photo: {
+    type: String,
+    default: 'default.jpg',
+  },
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpire: Date,

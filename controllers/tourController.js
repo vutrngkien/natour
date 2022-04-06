@@ -1,10 +1,59 @@
+const multer = require('multer');
+const sharp = require('sharp');
 const Tour = require('../models/tourModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const handleFactory = require('./handlefactory');
 // /tour-within/:distance/center/:latlng/unit/:unit
 
+const storage = multer.memoryStorage();
+
+// chi cho phep upload file Image
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new AppError('Only support upload Photo here!', 400), false);
+  }
+};
+
+const upload = multer({ storage, fileFilter });
 module.exports = {
+  uploadTourImgs: upload.fields([
+    { name: 'imageCover', maxCount: 1 },
+    { name: 'images', maxCount: 3 },
+  ]),
+  resizeTourImgs: catchAsync(async (req, res, next) => {
+    if (!req.files.imageCover || !req.files.images) return next();
+
+    const imageCover = `user-${req.params.id}-${Date.now()}-cover.jpeg`;
+
+    req.body.imageCover = imageCover;
+
+    await sharp(req.files.imageCover[0].buffer)
+      .resize(2000, 1333)
+      .toFormat('jpeg')
+      .jpeg({ quality: 90 })
+      .toFile(`public/img/tours/${imageCover}`);
+
+    req.body.images = [];
+
+    await Promise.all(
+      req.files.images.map(async (img, i) => {
+        const imageName = `user-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
+
+        await sharp(img.buffer)
+          .resize(2000, 1333)
+          .toFormat('jpeg')
+          .jpeg({ quality: 90 })
+          .toFile(`public/img/tours/${imageName}`);
+
+        req.body.images.push(imageName);
+      })
+    );
+
+    next();
+  }),
   tourWithin: catchAsync(async (req, res, next) => {
     const { distance, latlng, unit } = req.params;
     const [lat, lng] = latlng.split(',');
