@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const Tour = require('../models/tourModel');
 const User = require('../models/userModel');
 const Review = require('../models/reviewModel');
-
-mongoose.connect('mongodb://localhost:27017/natours');
+// 'mongodb://localhost:27017/natours'
+mongoose.connect(process.env.DB_URL);
 
 const tour = JSON.parse(fs.readFileSync('./dev-data/data/tours.json', 'utf-8'));
 const user = JSON.parse(fs.readFileSync('./dev-data/data/users.json', 'utf-8'));
