@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "debug": "ndb server.js",
     "watch:js": "parcel watch ./public/js/index.js --out-dir ./public/js --out-file bundler.js",
-    "build:js": "parcel watch ./public/js/index.js --out-dir ./public/js --out-file bundler.js"
+    "build:js": "parcel build ./public/js/index.js --out-dir ./public/js --out-file bundler.js"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +19,7 @@
     "@babel/polyfill": "^7.12.1",
     "axios": "^0.26.1",
     "bcryptjs": "^2.4.3",
+    "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.0.0",
     "eslint": "^8.11.0",

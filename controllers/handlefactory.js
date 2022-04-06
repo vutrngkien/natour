@@ -5,7 +5,7 @@ const AppError = require('../utils/appError');
 exports.deleteOne = (Model) => {
   return catchAsync(async (req, res, next) => {
     const doc = await Model.findByIdAndDelete(req.params.id);
-    console.log(doc);
+    // console.log(doc);
     if (!doc)
       return next(
         new AppError('Document dont exist, please try it again!', 400)

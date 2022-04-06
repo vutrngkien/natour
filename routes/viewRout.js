@@ -18,6 +18,8 @@ Router.get(
   viewController.getTour
 );
 Router.get('/login', authController.isLoggedIn, viewController.getLoginForm);
+Router.get('/sign-up', viewController.getSignUpForm);
 Router.get('/me', authController.protect, viewController.getAccount);
+Router.get('/my-tour', authController.protect, viewController.getMyTour);
 
 module.exports = Router;

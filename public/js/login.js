@@ -7,7 +7,7 @@ export const login = async (email, password) => {
     // thuc hien tao req den sever
     const res = await axios({
       method: 'post',
-      url: 'http://localhost:3000/api/v1/users/login',
+      url: '/api/v1/users/login',
       data: {
         email,
         password,
@@ -29,11 +29,37 @@ export const logout = async () => {
     // thuc hien tao req den sever
     const res = await axios({
       method: 'get',
-      url: 'http://localhost:3000/api/v1/users/logout',
+      url: '/api/v1/users/logout',
     });
     if (res.data.status === 'success') {
       showAlert('success', 'logging out successfully!');
       location.reload(true);
+    }
+  } catch (err) {
+    showAlert('error', err.response.data.message);
+  }
+};
+
+exports.signup = async (name, email, password, passwordConfirm) => {
+  try {
+    if (password !== passwordConfirm) {
+      showAlert('error', 'Your password dont match!, try again!');
+    } else {
+      // thuc hien tao req den sever
+      const res = await axios({
+        method: 'post',
+        url: '/api/v1/users/signup',
+        data: {
+          name,
+          email,
+          password,
+          passwordConfirm,
+        },
+      });
+      if (res.data.status === 'success') {
+        showAlert('success', 'Sign up successfully!');
+        location.assign('/');
+      }
     }
   } catch (err) {
     showAlert('error', err.response.data.message);
