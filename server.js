@@ -11,7 +11,16 @@ const mongoose = require('mongoose');
 
 const app = require('./app');
 
-mongoose.connect('mongodb://localhost:27017/natours');
+const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/natours';
+
+mongoose
+  .connect(dbUrl)
+  .then(() => {
+    console.log('connect database');
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
 const server = app.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}!`);
