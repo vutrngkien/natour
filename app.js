@@ -8,6 +8,7 @@ const xss = require('xss-clean');
 const hpp = require('hpp');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
+const cors = require('cors');
 
 const tourRout = require('./routes/tourRout');
 const userRout = require('./routes/userRout');
@@ -19,6 +20,24 @@ const errorController = require('./controllers/errorController');
 const AppError = require('./utils/appError');
 
 const app = express();
+
+// Set the ip-address of your trusted reverse proxy server such as
+// haproxy or Apache mod proxy or nginx configured as proxy or others.
+// The proxy server should insert the ip address of the remote client
+// through request header 'X-Forwarded-For' as
+// 'X-Forwarded-For: some.client.ip.address'
+// Insertion of the forward header is an option on most proxy software
+app.enable('trust proxy');
+
+app.use(cors());
+// Access-Control-Allow-Origin *
+// api.natours.com, front-end natours.com
+// app.use(cors({
+//   origin: 'https://www.natours.com'
+// }))
+
+app.options('*', cors());
+// app.options('/api/v1/tours/:id', cors());
 
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
