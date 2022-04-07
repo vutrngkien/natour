@@ -56,6 +56,9 @@ const limiter = rateLimit({
 });
 //gioi han req den tu 1 ip
 app.use('/api', limiter);
+
+app.post('/webhook-checkout');
+
 //body parser, reading data from body to req.body
 app.use(express.json({ limit: '10kb' }));
 app.use(cookieParser());
